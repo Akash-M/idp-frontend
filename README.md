@@ -7,8 +7,7 @@ Installing Bootstrap using Bower
 
 
 
-# sebamaster-nostradamus-frontend application
-Forked from example application based on AngularJS. Example application backend can be found [here](https://bitbucket.org/sebischair/sebamaster-movie-backend/overview)
+# TUM Baggage Handling System
 
 ## Prerequisites
 

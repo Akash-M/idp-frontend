@@ -1,14 +1,14 @@
 {
-  "name": "angular-movies",
+  "name": "idp-frontend",
   "private": true,
   "version": "0.0.0",
-  "description": "Movies example application based on AngularJS",
-  "repository": "https://github.com/adrianhdezm/angular-movies",
+  "description": "IDP Baggage Handling System",
+  "repository": "https://github.com/Akash-M/idp-frontend",
   "license": "MIT",
   "scripts": {
     "postinstall": "bower install && gulp clean && gulp install",
     "prestart": "npm install",
-    "start": "http-server -a localhost -p 8000 -c-1"
+    "start": "gulp webserver"
   },
   "dependencies": {
     "gulp-clean": "^0.3.2",
