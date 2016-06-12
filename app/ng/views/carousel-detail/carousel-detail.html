@@ -1,0 +1,67 @@
+<style>
+    text{
+        font-size: 18px !important;
+    }
+</style>
+
+<div layout="column" layout-padding style="margin-top:2%;">
+
+    <div>
+
+        <md-card mv-carousel-list-drop-down md-whiteframe="3"></md-card>
+
+    </div>
+
+    <div>
+
+    <md-card ng-if="showCarousel"md-whiteframe="3">
+
+        <md-card-title-text style="margin-left:20px;">
+            <span class="md-headline"><h4><b>Carousel ID : {{carouselID}}</b></h4></span>
+        </md-card-title-text>
+
+        <md-card-content>
+
+            <md-table-container>
+
+                <div layout="row">
+                <div layout="column">
+                <table class="table table-hover table-mc-light-blue table-bordered"
+                       style="width:500px;" ng-repeat="flight in listOfFlights">
+                    <thead style="font-size:18px;">
+                    <tr style="background-color:#d9d9d9;">
+                        <td style="width:200px;" class="tableCell" colspan="4"><b>Flight #{{flight.flight_id}}</b></td></tr>
+                    <tr>
+                        <td><b>Time</b></td>
+                        <td><b>Event</b></td>
+                        <td><b>Bags</b></td>
+                    </tr>
+                    </thead>
+                    <tbody style="font-size:18px;">
+                    <tr class="tableCell" ng-repeat="event in flight.Events">
+                        <td style="width:200px;" class="tableCell">{{event.time}}</td>
+                        <td style="width:200px;" class="tableCell">{{event.name}}</td>
+                        <td style="width:200px;" class="tableCell">
+                            <span ng-if="!event.bags">0</span>
+                            {{event.bags}}
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                </div>
+                <div style="width:1400px;height:600px;margin-left:50px;border:1px solid #d9d9d9;
+                    background-color:white;">
+
+                <nvd3 options="options" data="data" class="with-3d-shadow with-transitions"></nvd3>
+
+                </div>
+                </div>
+            </md-table-container>
+
+        </md-card-content>
+
+    </md-card>
+
+    </div>
+
+</div>

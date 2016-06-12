@@ -1,0 +1,52 @@
+<style>
+    .selectdemoSelectHeader {
+        /* Please note: All these selectors are only applied to children of elements with the 'selectdemoSelectHeader' class */ }
+    md-select span{
+        font-size:18px !important;
+    }
+    .selectdemoSelectHeader .demo-header-searchbox {
+        border: none;
+        outline: none;
+        height: 100%;
+        width: 100%;
+        padding: 0;
+        font-size:14px !important;
+    }
+    .selectdemoSelectHeader .demo-select-header {
+        box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.1), 0 0 0 0 rgba(0, 0, 0, 0.14), 0 0 0 0 rgba(0, 0, 0, 0.12);
+        padding-left: 10.667px;
+        height: 48px;
+        cursor: pointer;
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: auto;
+        font-size:14px !important;;}
+    .selectdemoSelectHeader md-content._md {
+        max-height: 240px;
+        }
+
+
+</style>
+
+<div layout="row">
+
+    <div flex="50" style="margin-left:20px;">
+
+        <div class="md-padding" ng-cloak>
+            <div>
+                <h1 class="md-title"><b>PICK A CAROUSEL</b></h1>
+                <div layout="row">
+                    <md-input-container flex="50">
+                        <md-select ng-model="selectedItem" md-selected-text="displayCarouselDetails()">
+                            <md-optgroup label="Carousels">
+                                <md-option ng-value="carousel" ng-repeat="carousel in carouselIDList">
+                                    Carousel {{carousel}}</md-option>
+                            </md-optgroup>
+                        </md-select>
+                    </md-input-container>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

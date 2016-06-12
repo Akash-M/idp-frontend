@@ -1,0 +1,23 @@
+ui-breadcrumbs {
+  overflow: hidden;
+}
+.breadcrumbs {
+
+  list-style: none;
+  white-space: nowrap;
+  overflow:hidden;
+
+  .crumb {
+
+      display: inline-block;
+
+      + :before {
+        content: ">";
+        padding: 0 5px;
+      }
+
+    }
+}
+
+
+

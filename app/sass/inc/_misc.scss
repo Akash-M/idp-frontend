@@ -1,0 +1,20 @@
+
+//fix for md-no-atuogrow
+//taken from https://github.com/angular/material/issues/2039#issuecomment-166942728
+md-input-container textarea[md-no-autogrow].md-input {
+  height: inherit;
+  overflow-y: auto;
+}
+
+.mv-error-text {
+  color: red;
+}
+
+/*
+
+body * {
+  background-color: #202A47;
+  color:white !important;
+}
+*/
+

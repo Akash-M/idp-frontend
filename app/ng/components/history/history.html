@@ -1,0 +1,65 @@
+<style>
+    .tableCell{
+        width:150px;
+        font-size:20px;
+        border:1px solid #202A47 !important;
+    }
+
+</style>
+
+<md-card-title>
+
+    <md-card-title-text>
+        <span class="md-headline">All carousel details :</span>
+    </md-card-title-text>
+
+</md-card-title>
+
+<md-card-content>
+    <form class="form-inline">
+        <div class="form-group">
+            <input type="text" ng-model="search" class="form-control" placeholder="Search">
+        </div>
+    </form>
+
+    <br/>
+
+    <md-table-container >
+        <table class="table table-hover table-mc-light-blue table-bordered"
+               style="background-color:white;!important;">
+            <thead style="background-color:#202A47;color:white;">
+            <tr>
+                <th class="tableCell" style="color:white;"><b>ID</b></th>
+                <th class="tableCell" style="color:white;"><b>X Coordinate</b></th>
+                <th class="tableCell" style="color:white;"><b>Y Coordinate</b></th>
+                <th class="tableCell" style="color:white;"><b>Parking Positions</b></th>
+                <th class="tableCell" style="color:white;"><b>Max. Capacity</b></th>
+                <th class="tableCell" style="color:white;"><b>Current Capacity</b></th>
+                <th class="tableCell" style="color:white;"><b>Flights Assigned</b></th>
+                <th class="tableCell" style="color:white;"><b>Working Stations Assigned</b></th>
+            </tr>
+            </thead>
+            <tbody >
+            <tr dir-paginate="data in dashboardTable | filter:search | itemsPerPage:10 | orderBy:-data.date" class="tableCell">
+                <td data-title="id" class="tableCell">{{data.id}}</td>
+                <td data-title="xCoordinate" class="tableCell">{{data.xCoordinate}}</td>
+                <td data-title="xCoordinate" class="tableCell">{{data.yCoordinate}}</td>
+                <td data-title="parkingPositions" class="tableCell">{{data.parkingPositions}}</td>
+                <td data-title="maxCapacity" class="tableCell">{{data.maxCapacity}}</td>
+                <td data-title="currentCapacity" class="tableCell">{{data.currentCapacity}}</td>
+                <td data-title="flight_id" class="tableCell">
+                    <span ng-repeat="flight in data.flight_id">{{flight}} &nbsp&nbsp</span>
+                </td>
+                <td data-title="workingStationsAssigned" class="tableCell">
+                    <span ng-repeat="workstation in data.workingStationsAssigned">{{workstation}} &nbsp&nbsp</span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </md-table-container>
+    <dir-pagination-controls
+            max-size="5"
+            direction-links="true"
+            boundary-links="true" >
+    </dir-pagination-controls>
+</md-card-content>

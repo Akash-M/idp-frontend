@@ -1,0 +1,20 @@
+//normalize
+@import '../../bower_components/normalize-libsass/normalize.scss';
+
+
+
+@import "custom_normalize.scss";
+@import 'vars/colors';
+@import 'inc/inc';
+
+
+//material-design lib
+@import '../../bower_components/angular-material/angular-material.scss';
+@import '../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap';
+@import '../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap-compass';
+@import '../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap-mincer';
+@import '../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap-sprockets';
+
+
+
+
