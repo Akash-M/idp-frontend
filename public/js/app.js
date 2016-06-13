@@ -2,7 +2,7 @@
 
 // Declare app level module which depends on views, and components
 angular.module('myApp',
-    ['ui.router', 'ui.bootstrap', 'chart.js', 'myApp.dashboard','myApp.carouseldetail', 'templates',
+    ['ui.router', 'myApp.dashboard','myApp.carouseldetail', 'templates',
         'ncy-angular-breadcrumb', 'ngMaterial', 'ngResource', 'ngMessages', 'ngMdIcons', 'md.data.table'])
 
     .config(["$stateProvider", "$urlRouterProvider", "$mdIconProvider", "$resourceProvider", "$httpProvider", "$breadcrumbProvider", function ($stateProvider, $urlRouterProvider, $mdIconProvider, $resourceProvider, $httpProvider, $breadcrumbProvider) {
@@ -38,7 +38,7 @@ angular.module('myApp',
 /**
  * Created by Akash on 6/12/2016.
  */
-angular.module('myApp.carouseldetail', ['ngResource', 'ui.router','ui.select','ngMaterial',
+angular.module('myApp.carouseldetail', ['ngResource', 'ui.router','ngMaterial',
     'ngResource','angularUtils.directives.dirPagination','angularjs-dropdown-multiselect','nvd3'])
 
     .config(["$stateProvider", "$urlRouterProvider", "carouseldetailState", function ($stateProvider, $urlRouterProvider, carouseldetailState) {

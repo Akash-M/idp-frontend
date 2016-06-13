@@ -1,7 +1,7 @@
 /**
  * Created by Akash on 6/12/2016.
  */
-angular.module('myApp.carouseldetail', ['ngResource', 'ui.router','ui.select','ngMaterial',
+angular.module('myApp.carouseldetail', ['ngResource', 'ui.router','ngMaterial',
     'ngResource','angularUtils.directives.dirPagination','angularjs-dropdown-multiselect','nvd3'])
 
     .config(function ($stateProvider, $urlRouterProvider, carouseldetailState) {
