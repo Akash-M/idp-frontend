@@ -3,7 +3,7 @@
 // Declare app level module which depends on views, and components
 angular.module('myApp',
         ['ui.router', 'ui.bootstrap', 'myApp.dashboard','myApp.carouseldetail', 'templates','highcharts-ng','ngTable',
-        'ncy-angular-breadcrumb', 'ngMaterial', 'ngResource', 'ngMessages', 'md.data.table'])
+        'ncy-angular-breadcrumb', 'ngMaterial', 'ngResource', 'ngMessages'])
 
     .config(["$stateProvider", "$urlRouterProvider", "$mdIconProvider", "$resourceProvider", "$httpProvider", "$breadcrumbProvider", function ($stateProvider, $urlRouterProvider, $mdIconProvider, $resourceProvider, $httpProvider, $breadcrumbProvider) {
 
@@ -39,7 +39,7 @@ angular.module('myApp',
  * Created by Akash on 6/12/2016.
  */
 angular.module('myApp.carouseldetail', ['ngResource', 'ui.router','ui.select','ngMaterial',
-        'ngResource','angularUtils.directives.dirPagination','nvd3','highcharts-ng'])
+        'ngResource','highcharts-ng'])
 
     .config(["$stateProvider", "$urlRouterProvider", "carouseldetailState", function ($stateProvider, $urlRouterProvider, carouseldetailState) {
         $stateProvider
@@ -512,7 +512,7 @@ angular.module('myApp.carouseldetail')
             }
         }
     })
-    .controller('CarouselDetailCtrl', ["$scope", "CarouselDetail", "$http", "BASEURL", "$interval", function($scope, CarouselDetail, $http, BASEURL, $interval) {
+    .controller('CarouselDetailCtrl', ["$scope", "CarouselDetail", "$http", "BASEURL", "$interval", "NgTableParams", function($scope, CarouselDetail, $http, BASEURL, $interval,NgTableParams) {
 
         $http({
             method: 'GET',
@@ -521,8 +521,7 @@ angular.module('myApp.carouseldetail')
             var carouselIDList = response.data.Carousel_ids;
             $scope.carouselIDList = carouselIDList;
             $scope.showCarousel = false;
-            console.log("getting all carousel list");
-            console.log($scope.showCarousel);
+
         }, function errorCallback(response) {
             alert("error retrieving carousel list");
         });
@@ -535,7 +534,6 @@ angular.module('myApp.carouseldetail')
         function getCarouselDetails(){
 
             if ($scope.selectedItem !== false) {
-                //$scope.showCarousel = true;
                 $http({
                     method: 'GET',
                     url: BASEURL + '/api/v1/getAllCarouselEvents/' + $scope.selectedItem
@@ -546,6 +544,23 @@ angular.module('myApp.carouseldetail')
                     var listOfFlights = carouselEvents.Flights;
                     $scope.carouselID = carouselID;
                     $scope.listOfFlights = listOfFlights;
+
+                    $scope.tableParams = createUsingFullOptions();
+
+                    function createUsingFullOptions() {
+                        var initialParams = {
+                            count: 10 // initial page size
+                        };
+                        var initialSettings = {
+                            // page size buttons (right set of buttons in demo)
+                            counts: [],
+                            // determines the pager buttons (left set of buttons in demo)
+                            paginationMaxBlocks: 10,
+                            paginationMinBlocks: 2,
+                            dataset: listOfFlights
+                        };
+                        return new NgTableParams(initialParams, initialSettings);
+                    }
 
                     var flightNumbers = [];
                     var flightData = [];
@@ -581,7 +596,6 @@ angular.module('myApp.carouseldetail')
                     timeStamps = timeStamps.sort();
                     flightNumbers = flightNumbers.sort();
                     var chartData = [];
-                    console.log("CONSTRUCTING CHART DATA");
                     for(var octr=0;octr<flightData.length;octr++){
                         var flightEvents = {};
                         flightEvents["name"] = flightData[octr].name;
@@ -597,7 +611,6 @@ angular.module('myApp.carouseldetail')
                         for(var ictr=0;ictr<timeStamps.length;ictr++){
                             var index = existingTimeStamps.indexOf(timeStamps[ictr]);
                             if(index>=0){
-                                console.log(timeEvents[index].y);
                                 flightBags.push(timeEvents[index].y);
                             }
                             else{ // timestamp does not exist
@@ -608,7 +621,7 @@ angular.module('myApp.carouseldetail')
                         chartData.push(flightEvents);
                     }
 
-                    var chartConfig = {
+                    var pieChartConfig = {
                         chart: {
                             type: 'column',
                             options3d: {
@@ -621,12 +634,13 @@ angular.module('myApp.carouseldetail')
                         },
 
                         title: {
-                            text: 'LOAD ON CAROUSEL',
+                            text: 'LOAD ON CAROUSEL(Stacked Bar representation)',
                             style : {
                                 fontWeight:'bold',
                                 fontStyle:'italic',
                                 fontFamily:'Calibri',
-                                color:'black'
+                                color:'black',
+                                fontSize: '24'
                             }
                         },
                         xAxis: {
@@ -634,17 +648,19 @@ angular.module('myApp.carouseldetail')
                                 text: 'time',
                                 style : {
                                     fontWeight:'bold',
-                                    color:'black'
+                                    color:'black',
+                                    fontSize: '24'
                                 }
                             },
                             categories: timeStamps
                         },
                         yAxis: {
                             title: {
-                                text: 'time',
+                                text: 'No.of bags',
                                 style : {
                                     fontWeight:'bold',
-                                    color:'black'
+                                    color:'black',
+                                    fontSize: '24'
                                 }
                             },
                             min: 0,
@@ -652,8 +668,9 @@ angular.module('myApp.carouseldetail')
                             stackLabels: {
                                 enabled: true,
                                 style: {
-                                    fontWeight: 'bold',
-                                    color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+                                    fontWeight: 'bolder',
+                                    color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray',
+                                    fontSize: '24'
                                 }
                             }
                         },
@@ -694,7 +711,56 @@ angular.module('myApp.carouseldetail')
                         series: chartData
                     };
 
-                    $scope.chartConfig = chartConfig;
+                    $scope.pieChartConfig = pieChartConfig;
+
+                    var lineChartConfig = {
+                        chart: {
+                            type: 'bar'
+                        },
+                        title: {
+                            text: 'LOAD ON CAROUSEL(Stacked Line Representation)',
+                            style : {
+                                fontWeight:'bold',
+                                fontStyle:'italic',
+                                fontFamily:'Calibri',
+                                color:'black',
+                                fontSize: '24'
+                            }
+                        },
+                        xAxis: {
+                            categories: timeStamps
+                        },
+                        yAxis: {
+                            title: {
+                                text: 'No.of bags',
+                                style : {
+                                    fontWeight:'bold',
+                                    color:'black'
+                                }
+                            },
+                            min: 0,
+                            max:40,
+                            stackLabels: {
+                                enabled: true,
+                                style: {
+                                    fontWeight: 'bold',
+                                    color: 'black',
+                                    fontSize: '30'
+                                }
+                            }
+                        },
+                        legend: {
+                            reversed: true
+                        },
+                        plotOptions: {
+                            series: {
+                                stacking: 'normal'
+                            }
+                        },
+                        series: chartData
+                    };
+
+                    $scope.lineChartConfig = lineChartConfig;
 
                 }, function errorCallback(response) {
                     alert("error retrieving carousel details");
@@ -712,7 +778,7 @@ angular.module('myApp.carouseldetail')
                 console.log("reloading..");
                 getCarouselDetails();
             }
-        },5000);
+        },10000);
 
 
     }]);
@@ -752,11 +818,6 @@ angular.module('myApp.dashboard')
                 dashboardDetails.push(dashboardDetailsPromise[ctr]);
             }
 
-
-            console.log(dashboardDetails);
-
-            //$scope.dashboardTable = dashboardDetails;
-            //$scope.tableParams = new NgTableParams({}, { dataset: $scope.dashboardTable});
             $scope.tableParams = createUsingFullOptions();
 
             function createUsingFullOptions() {
@@ -787,39 +848,6 @@ angular.module('myApp.dashboard')
             }
 
             var pieChartConfig = {
-                /*chart: {
-                 type: 'bar'
-                 },
-                 title: {
-                 text: 'Stacked bar chart'
-                 },
-                 xAxis: {
-                 categories: ['Apples', 'Oranges', 'Pears', 'Grapes', 'Bananas']
-                 },
-                 yAxis: {
-                 min: 0,
-                 title: {
-                 text: 'Total fruit consumption'
-                 }
-                 },
-                 legend: {
-                 reversed: true
-                 },
-                 plotOptions: {
-                 series: {
-                 stacking: 'normal'
-                 }
-                 },
-                 series: [{
-                 name: 'John',
-                 data: [5, 3, 4, 7, 2]
-                 }, {
-                 name: 'Jane',
-                 data: [2, 2, 3, 2, 1]
-                 }, {
-                 name: 'Joe',
-                 data: [3, 4, 4, 2, 5]
-                 }]*/
                 chart: {
                     renderTo: 'container',
                     plotBackgroundColor: null,
@@ -827,11 +855,26 @@ angular.module('myApp.dashboard')
                     plotShadow: false
                 },
                 title: {
-                    text: 'Carousel Status'
+                    text: 'Carousel Status',
+                    style : {
+                        fontWeight:'bold',
+                        fontStyle:'italic',
+                        fontFamily:'Calibri',
+                        color:'black',
+                        fontSize: '24'
+                    }
+
                 },
                 tooltip: {
                     pointFormat: '{series.name}: <b>{point.percentage}%</b>',
-                    percentageDecimals: 1
+                    percentageDecimals: 1,
+                    style : {
+                        fontWeight:'bold',
+                        fontStyle:'italic',
+                        fontFamily:'Calibri',
+                        color:'black',
+                        fontSize: '18'
+                    }
                 },
                 plotOptions: {
                     pie: {
@@ -845,7 +888,14 @@ angular.module('myApp.dashboard')
                                 return '<b>' + this.point.name + '</b>: ' + this.percentage + ' %';
                             }
                         },
-                        showInLegend: true
+                        showInLegend: true,
+                        style : {
+                            fontWeight:'bold',
+                            fontStyle:'italic',
+                            fontFamily:'Calibri',
+                            color:'black',
+                            fontSize: '18'
+                        }
                     }
                 },
                 series: [{
@@ -875,8 +925,9 @@ angular.module('myApp.dashboard')
         };
 
         $interval(function(){
-            console.log("Reloading data ...")
+            console.log("Reloading data ...");
+            dashboardDetailsPromise =  Dashboard.query(getDashboardDetails);
             getDashboardDetails();
-        },50000);
+        },10000);
 
     }]);

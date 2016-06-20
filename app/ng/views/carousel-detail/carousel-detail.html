@@ -1,97 +1,77 @@
 <style>
     text{
-        font-size: 18px !important;
+        font-weight: bold;
+        color: black;
+        font-size: 24px;
     }
-    svg {
-        font: 10px sans-serif;
-        shape-rendering: crispEdges;
-    }
-
-    .axis path,
-    .axis line {
-        fill: none;
-        stroke: #000;
-    }
-
-    path.domain {
-        stroke: none;
-    }
-
-    .y .tick line {
-        stroke: #ddd;
-    }
-    .nv-x.nv-axis.nvd3-svg {
-        margin : 10px;
-    }
-
 </style>
-
-
 <div layout="column" layout-padding style="margin-top:2%;">
 
-    <div>
+    <div layout="row">
 
-        <md-card mv-carousel-list-drop-down md-whiteframe="3" style="border-left:5px solid #202A47;border-radius:5px;">
-
+        <md-card mv-carousel-list-drop-down md-whiteframe="3"
+                 style="border-left:5px solid #202A47;border-radius:5px;" flex="25">
         </md-card>
 
     </div>
 
+    <div layout="row">
+
+        <md-card flex="25" ng-if="showCarousel" md-whiteframe="3" style="border-left:5px solid #202A47;border-radius:5px;">
+
+            <md-card-title-text style="margin-left:20px;">
+                <span class="md-headline"><h4><b>Carousel ID : {{carouselID}}</b></h4></span>
+            </md-card-title-text>
+
+            <md-card-content>
 
 
-    <div>
+                <div layout="column">
 
-        <div layout="column">
+                    <table class="table table-bordered table-striped" ng-table="tableParams"
+                           style="width:100%;margin-left:1%" ng-repeat="flight in $data">
 
-            <md-card ng-if="showCarousel" md-whiteframe="3" style="border-left:5px solid #202A47;border-radius:5px;">
+                        <tr>
+                            <td colspan="4"><b>FLIGHT #{{flight.flight_id}}</b></td></tr>
 
-                <md-card-title-text style="margin-left:20px;">
-                    <span class="md-headline"><h4><b>Carousel ID : {{carouselID}}</b></h4></span>
-                </md-card-title-text>
+                        <tr>
+                            <td><b>TIME</b></td>
+                            <td><b>EVENTS</b></td>
+                            <td><b>NO. OF BAGS</b></td>
+                        </tr>
 
-                <md-card-content>
+                        <tr ng-repeat="event in flight.Events">
+                            <td data-title="'Time'" style="width:auto">{{event.time}}</td>
+                            <td data-title="'Events'" style="width:auto">{{event.name}}</td>
+                            <td data-title="'No. of Bags'" style="width:auto">
+                                <span ng-if="!event.bags">0</span>
+                                {{event.bags}}
+                            </td>
+                        </tr>
 
-                    <md-table-container>
+                    </table>
+                </div>
 
-                        <div layout="column">
-                            <div layout="row">
-                                <table class="table table-hover table-mc-light-blue table-bordered"
-                                       style="width:500px;margin-left:1%" ng-repeat="flight in listOfFlights">
-                                    <thead style="font-size:18px;">
-                                    <tr style="background-color:#d9d9d9;">
-                                        <td style="width:200px;" class="tableCell" colspan="4"><b>Flight #{{flight.flight_id}}</b></td></tr>
-                                    <tr>
-                                        <td><b>Time</b></td>
-                                        <td><b>Event</b></td>
-                                        <td><b>Bags</b></td>
-                                    </tr>
-                                    </thead>
-                                    <tbody style="font-size:18px;">
-                                    <tr class="tableCell" ng-repeat="event in flight.Events">
-                                        <td style="width:200px;" class="tableCell">{{event.time}}</td>
-                                        <td style="width:200px;" class="tableCell">{{event.name}}</td>
-                                        <td style="width:200px;" class="tableCell">
-                                            <span ng-if="!event.bags">0</span>
-                                            {{event.bags}}
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </md-table-container>
 
-                </md-card-content>
+            </md-card-content>
 
+        </md-card>
+
+        <div layout="column" flex>
+            <md-card ng-if="showCarousel" md-whiteframe="3" layout-padding="3"
+                     style="border-left:5px solid #202A47;border-radius:5px;height:auto">
+                <highchart config="pieChartConfig"
+                           class="span10" style="width:95%;"></highchart>
             </md-card>
-
-            <md-card ng-if="showCarousel" md-whiteframe="3" layout-padding="3" style="border-left:5px solid #202A47;border-radius:5px;">
-                <highchart config="chartConfig"
-                           class="span10" style="width:95%;height:400px;"></highchart>
+            <md-card ng-if="showCarousel" md-whiteframe="3" layout-padding="3"
+                     style="border-left:5px solid #202A47;border-radius:5px;height:auto">
+                <highchart config="lineChartConfig"
+                           class="span10" style="width:95%;"></highchart>
             </md-card>
-
         </div>
 
     </div>
+
+</div>
 
 </div>

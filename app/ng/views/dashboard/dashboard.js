@@ -63,39 +63,6 @@ angular.module('myApp.dashboard')
             }
 
             var pieChartConfig = {
-                /*chart: {
-                 type: 'bar'
-                 },
-                 title: {
-                 text: 'Stacked bar chart'
-                 },
-                 xAxis: {
-                 categories: ['Apples', 'Oranges', 'Pears', 'Grapes', 'Bananas']
-                 },
-                 yAxis: {
-                 min: 0,
-                 title: {
-                 text: 'Total fruit consumption'
-                 }
-                 },
-                 legend: {
-                 reversed: true
-                 },
-                 plotOptions: {
-                 series: {
-                 stacking: 'normal'
-                 }
-                 },
-                 series: [{
-                 name: 'John',
-                 data: [5, 3, 4, 7, 2]
-                 }, {
-                 name: 'Jane',
-                 data: [2, 2, 3, 2, 1]
-                 }, {
-                 name: 'Joe',
-                 data: [3, 4, 4, 2, 5]
-                 }]*/
                 chart: {
                     renderTo: 'container',
                     plotBackgroundColor: null,
@@ -103,11 +70,26 @@ angular.module('myApp.dashboard')
                     plotShadow: false
                 },
                 title: {
-                    text: 'Carousel Status'
+                    text: 'Carousel Status',
+                    style : {
+                        fontWeight:'bold',
+                        fontStyle:'italic',
+                        fontFamily:'Calibri',
+                        color:'black',
+                        fontSize: '24'
+                    }
+
                 },
                 tooltip: {
                     pointFormat: '{series.name}: <b>{point.percentage}%</b>',
-                    percentageDecimals: 1
+                    percentageDecimals: 1,
+                    style : {
+                        fontWeight:'bold',
+                        fontStyle:'italic',
+                        fontFamily:'Calibri',
+                        color:'black',
+                        fontSize: '18'
+                    }
                 },
                 plotOptions: {
                     pie: {
@@ -121,7 +103,14 @@ angular.module('myApp.dashboard')
                                 return '<b>' + this.point.name + '</b>: ' + this.percentage + ' %';
                             }
                         },
-                        showInLegend: true
+                        showInLegend: true,
+                        style : {
+                            fontWeight:'bold',
+                            fontStyle:'italic',
+                            fontFamily:'Calibri',
+                            color:'black',
+                            fontSize: '18'
+                        }
                     }
                 },
                 series: [{

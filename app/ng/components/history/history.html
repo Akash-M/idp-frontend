@@ -13,6 +13,9 @@
     .green {
         background-color: lightgreen !important;
     }
+    .title{
+        font-weight:bold;
+    }
 
 </style>
 
@@ -28,22 +31,22 @@
 <br/>
 
 <table class="table table-bordered table-striped"
-       ng-table="tableParams">
+       ng-table="tableParams" style="width:95%;">
 
     <tr ng-repeat="data in $data | filter:search | orderBy:'id'" >
-        <td data-title="'ID'" >{{data.id}}</td>
-        <td data-title="'X-Coordinate'" >{{data.xCoordinate}}</td>
-        <td data-title="'Y-Coordinate'" >{{data.yCoordinate}}</td>
-        <td data-title="'Parking Positions'" >{{data.parkingPositions}}</td>
-        <td data-title="'Max. Capacity'" >{{data.maxCapacity}}</td>
-        <td data-title="'Current Capacity'" >{{data.currentCapacity}}</td>
-        <td data-title="'Flight ID'" >
-            <span ng-repeat="flight in data.flight_id">{{flight}} &nbsp&nbsp</span>
+        <td title="'ID'">{{data.id}}</td>
+        <td title="'X-Coordinate'" >{{data.xCoordinate}}</td>
+        <td title="'Y-Coordinate'" >{{data.yCoordinate}}</td>
+        <td title="'Parking Positions'" >{{data.parkingPositions}}</td>
+        <td title="'Current Capacity'" >{{data.currentCapacity}}</td>
+        <td title="'Max. Capacity'" >{{data.maxCapacity}}</td>
+        <td title="'Flight ID'" >
+            <span ng-repeat="flight in data.flight_id">{{flight}} <br/></span>
         </td>
-        <td data-title="'Working Stations Assigned'" >
-            <span ng-repeat="workstation in data.workingStationsAssigned">{{workstation}} &nbsp&nbsp</span>
+        <td title="'No. of work stations'" >
+            {{data.workstations}}
         </td>
-        <td data-title="'Status'" 
+        <td title="'Status'" 
             ng-class="{'red': (data.carouselStatus == 'DANGER'), 'orange': (data.carouselStatus =='WARNING'),
                                 'green':(data.carouselStatus == 'OK')}">{{data.carouselStatus}}
         </td>
