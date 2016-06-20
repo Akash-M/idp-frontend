@@ -3,7 +3,7 @@
 // Declare app level module which depends on views, and components
 angular.module('myApp',
         ['ui.router', 'ui.bootstrap', 'myApp.dashboard','myApp.carouseldetail', 'templates','highcharts-ng','ngTable',
-        'ncy-angular-breadcrumb', 'ngMaterial', 'ngResource', 'ngMessages', 'md.data.table'])
+        'ncy-angular-breadcrumb', 'ngMaterial', 'ngResource', 'ngMessages'])
 
     .config(function ($stateProvider, $urlRouterProvider, $mdIconProvider, $resourceProvider, $httpProvider, $breadcrumbProvider) {
 
