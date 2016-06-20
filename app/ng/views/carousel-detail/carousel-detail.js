@@ -118,7 +118,10 @@ angular.module('myApp.carouseldetail')
                                 flightBags.push(timeEvents[index].y);
                             }
                             else{ // timestamp does not exist
-                                flightBags.push(0);
+                                if(flightBags[flightBags.length-1])
+                                    flightBags.push(flightBags[flightBags.length-1]);
+                                else
+                                    flightBags.push(0);
                             }
                         }
                         flightEvents["data"] = flightBags;
