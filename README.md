@@ -1,12 +1,3 @@
-#Adding Subsequent dependencies
-Installing Bootstrap using Bower
-	1) run command: bower install angular-bootstrap --save-dev
-	2) Add angular dependency from devDependencies to dependencies in bower.json
-	3) run command: npm install
-  4) run command: gulp webserver
-
-
-
 # TUM Baggage Handling System
 
 ## Prerequisites
@@ -23,6 +14,11 @@ Just for the front end application
 * sass [official website](http://sass-lang.com/) - css preprocessor (you don't need to install sass, since it's already there as npm dependency on the project)
 
 
+# Commands
+ * installation command: npm install
+ * run command: gulp webserver
+
+
 ## Setup (before first run)
 
 * install npm and bower dependencies `npm install`
@@ -32,9 +28,7 @@ Just for the front end application
 * go to your project folder `cd to/your/folder`
 * use the command 'gulp websever' to start the application on port 8080
 
-## Directory structure
-
-and important files
+## Directory structure and important files
 
 ```
 app/                //your app
