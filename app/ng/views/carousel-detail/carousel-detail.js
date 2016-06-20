@@ -145,7 +145,7 @@ angular.module('myApp.carouseldetail')
                         },
                         yAxis: {
                             title: {
-                                text: 'time',
+                                text: 'No.of bags',
                                 style : {
                                     fontWeight:'bold',
                                     color:'black'
@@ -216,7 +216,7 @@ angular.module('myApp.carouseldetail')
                 console.log("reloading..");
                 getCarouselDetails();
             }
-        },5000);
+        },10000);
 
 
     });

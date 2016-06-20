@@ -33,8 +33,6 @@ angular.module('myApp.dashboard')
                 dashboardDetails.push(dashboardDetailsPromise[ctr]);
             }
 
-            //$scope.dashboardTable = dashboardDetails;
-            //$scope.tableParams = new NgTableParams({}, { dataset: $scope.dashboardTable});
             $scope.tableParams = createUsingFullOptions();
 
             function createUsingFullOptions() {
@@ -156,6 +154,6 @@ angular.module('myApp.dashboard')
             console.log("Reloading data ...");
             dashboardDetailsPromise =  Dashboard.query(getDashboardDetails);
             getDashboardDetails();
-        },50000);
+        },10000);
 
     });
