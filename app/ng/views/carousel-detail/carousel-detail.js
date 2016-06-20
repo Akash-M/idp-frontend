@@ -136,8 +136,6 @@ angular.module('myApp.carouseldetail')
                         totalBags.push(flightEvents.data);
                     }
 
-                    console.log("total bags");
-                    console.log(totalBags);
                     var lineChartData = [];
                     for (var col = 0; col < totalBags[0].length; col++)
                     {
@@ -256,7 +254,8 @@ angular.module('myApp.carouseldetail')
                                     color:'black',
                                     fontSize: '24'
                                 }
-                            }
+                            },
+                            categories: timeStamps
                         },
                         yAxis: {
                             title: {
