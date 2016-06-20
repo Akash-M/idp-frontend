@@ -2,7 +2,7 @@
  * Created by Akash on 6/12/2016.
  */
 angular.module('myApp.carouseldetail', ['ngResource', 'ui.router','ui.select','ngMaterial',
-        'ngResource','nvd3','highcharts-ng'])
+        'ngResource','highcharts-ng'])
 
     .config(function ($stateProvider, $urlRouterProvider, carouseldetailState) {
         $stateProvider
