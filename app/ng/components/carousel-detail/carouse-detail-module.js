@@ -1,8 +1,8 @@
 /**
  * Created by Akash on 6/12/2016.
  */
-angular.module('myApp.carouseldetail', ['ngResource', 'ui.router','ngMaterial',
-    'ngResource','angularUtils.directives.dirPagination','angularjs-dropdown-multiselect','nvd3'])
+angular.module('myApp.carouseldetail', ['ngResource', 'ui.router','ui.select','ngMaterial',
+        'ngResource','angularUtils.directives.dirPagination','nvd3','highcharts-ng'])
 
     .config(function ($stateProvider, $urlRouterProvider, carouseldetailState) {
         $stateProvider
@@ -24,7 +24,5 @@ angular.module('myApp.carouseldetail', ['ngResource', 'ui.router','ngMaterial',
             // Using a '.' within a state name declares a child within a parent.
             // So you have a new state 'list' within the parent 'movies' state.
             .state(carouseldetailState.name, carouseldetailState.options);
-
-        //.state(movieDetailsState.name, movieDetailsState.options);
 
     });

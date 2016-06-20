@@ -1,7 +1,8 @@
 /**
  * Created by Akash on 6/2/2016.
  */
-angular.module('myApp.dashboard', ['ngResource', 'ui.router','ngMaterial','ngResource','angularUtils.directives.dirPagination'])
+angular.module('myApp.dashboard', ['ngResource', 'ui.router','ngMaterial',
+    'ngResource','ngTable'])
 
     .config(function ($stateProvider, $urlRouterProvider, dashboardState) {
         $stateProvider

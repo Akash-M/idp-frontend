@@ -2,8 +2,8 @@
 
 // Declare app level module which depends on views, and components
 angular.module('myApp',
-    ['ui.router', 'myApp.dashboard','myApp.carouseldetail', 'templates',
-        'ncy-angular-breadcrumb', 'ngMaterial', 'ngResource', 'ngMessages', 'ngMdIcons', 'md.data.table'])
+        ['ui.router', 'ui.bootstrap', 'myApp.dashboard','myApp.carouseldetail', 'templates','highcharts-ng','ngTable',
+        'ncy-angular-breadcrumb', 'ngMaterial', 'ngResource', 'ngMessages', 'md.data.table'])
 
     .config(["$stateProvider", "$urlRouterProvider", "$mdIconProvider", "$resourceProvider", "$httpProvider", "$breadcrumbProvider", function ($stateProvider, $urlRouterProvider, $mdIconProvider, $resourceProvider, $httpProvider, $breadcrumbProvider) {
 
@@ -38,8 +38,8 @@ angular.module('myApp',
 /**
  * Created by Akash on 6/12/2016.
  */
-angular.module('myApp.carouseldetail', ['ngResource', 'ui.router','ngMaterial',
-    'ngResource','angularUtils.directives.dirPagination','angularjs-dropdown-multiselect','nvd3'])
+angular.module('myApp.carouseldetail', ['ngResource', 'ui.router','ui.select','ngMaterial',
+        'ngResource','angularUtils.directives.dirPagination','nvd3','highcharts-ng'])
 
     .config(["$stateProvider", "$urlRouterProvider", "carouseldetailState", function ($stateProvider, $urlRouterProvider, carouseldetailState) {
         $stateProvider
@@ -61,8 +61,6 @@ angular.module('myApp.carouseldetail', ['ngResource', 'ui.router','ngMaterial',
             // Using a '.' within a state name declares a child within a parent.
             // So you have a new state 'list' within the parent 'movies' state.
             .state(carouseldetailState.name, carouseldetailState.options);
-
-        //.state(movieDetailsState.name, movieDetailsState.options);
 
     }]);
 
@@ -110,7 +108,8 @@ angular.module('myApp')
 /**
  * Created by Akash on 6/2/2016.
  */
-angular.module('myApp.dashboard', ['ngResource', 'ui.router','ngMaterial','ngResource','angularUtils.directives.dirPagination'])
+angular.module('myApp.dashboard', ['ngResource', 'ui.router','ngMaterial',
+    'ngResource','ngTable'])
 
     .config(["$stateProvider", "$urlRouterProvider", "dashboardState", function ($stateProvider, $urlRouterProvider, dashboardState) {
         $stateProvider
@@ -163,6 +162,314 @@ angular.module('myApp.dashboard')
         };
     });
 /**
+ * Sand-Signika theme for Highcharts JS
+ * @author Torstein Honsi
+ */
+
+// Load the fonts
+/*
+Highcharts.createElement('link', {
+    href: 'https://fonts.googleapis.com/css?family=Signika:400,700',
+    rel: 'stylesheet',
+    type: 'text/css'
+}, null, document.getElementsByTagName('head')[0]);
+
+// Add the background image to the container
+Highcharts.wrap(Highcharts.Chart.prototype, 'getContainer', function (proceed) {
+    proceed.call(this);
+    this.container.style.background = 'url(http://www.highcharts.com/samples/graphics/sand.png)';
+});
+
+
+Highcharts.theme = {
+    colors: ["#f45b5b", "#8085e9", "#8d4654", "#7798BF", "#aaeeee", "#ff0066", "#eeaaee",
+        "#55BF3B", "#DF5353", "#7798BF", "#aaeeee"],
+    chart: {
+        backgroundColor: null,
+        style: {
+            fontFamily: "Signika, serif"
+        }
+    },
+    title: {
+        style: {
+            color: 'black',
+            fontSize: '16px',
+            fontWeight: 'bold'
+        }
+    },
+    subtitle: {
+        style: {
+            color: 'black'
+        }
+    },
+    tooltip: {
+        borderWidth: 0
+    },
+    legend: {
+        itemStyle: {
+            fontWeight: 'bold',
+            fontSize: '13px'
+        }
+    },
+    xAxis: {
+        labels: {
+            style: {
+                color: '#6e6e70'
+            }
+        }
+    },
+    yAxis: {
+        labels: {
+            style: {
+                color: '#6e6e70'
+            }
+        }
+    },
+    plotOptions: {
+        series: {
+            shadow: true
+        },
+        candlestick: {
+            lineColor: '#404048'
+        },
+        map: {
+            shadow: false
+        }
+    },
+
+    // Highstock specific
+    navigator: {
+        xAxis: {
+            gridLineColor: '#D0D0D8'
+        }
+    },
+    rangeSelector: {
+        buttonTheme: {
+            fill: 'white',
+            stroke: '#C0C0C8',
+            'stroke-width': 1,
+            states: {
+                select: {
+                    fill: '#D0D0D8'
+                }
+            }
+        }
+    },
+    scrollbar: {
+        trackBorderColor: '#C0C0C8'
+    },
+
+    // General
+    background2: '#E0E0E8'
+
+};
+
+// Apply the theme
+Highcharts.setOptions(Highcharts.theme);*/
+
+/**
+ * Created by Akash on 6/19/2016.
+ */
+'use strict';
+
+angular.module('highcharts-ng', [])
+    .directive('highchart', function () {
+
+        function prependMethod(obj, method, func) {
+            var original = obj[method];
+            obj[method] = function () {
+                var args = Array.prototype.slice.call(arguments);
+                func.apply(this, args);
+                if(original) {
+                    return original.apply(this, args);
+                }  else {
+                    return;
+                }
+
+            };
+        }
+
+        function deepExtend(destination, source) {
+            for (var property in source) {
+                if (source[property] && source[property].constructor &&
+                    source[property].constructor === Object) {
+                    destination[property] = destination[property] || {};
+                    deepExtend(destination[property], source[property]);
+                } else {
+                    destination[property] = source[property];
+                }
+            }
+            return destination;
+        }
+
+        var seriesId = 0;
+        var ensureIds = function (series) {
+            series.forEach(function (s) {
+                if (!angular.isDefined(s.id)) {
+                    s.id = "series-" + seriesId++;
+                }
+            });
+        }
+
+        var defaultOptions = {
+            chart: {
+                events: {}
+            },
+            title: {},
+            series: [],
+            navigator: {enabled: false}
+        }
+
+        var getMergedOptions = function (scope, element, config) {
+            var mergedOptions = {}
+            if (config.options) {
+                mergedOptions = deepExtend(defaultOptions, config.options);
+            } else {
+                mergedOptions = defaultOptions;
+            }
+            mergedOptions.chart.renderTo = element[0];
+            if(config.xAxis) {
+                prependMethod(mergedOptions.chart.events, 'selection', function(e){
+                    var thisChart = this;
+                    if(e.xAxis) {
+                        scope.$apply(function () {
+                            scope.config.xAxis.currentMin = e.xAxis[0].min;
+                            scope.config.xAxis.currentMax = e.xAxis[0].max;
+                        });
+                    } else {
+                        //handle reset button - zoom out to all
+                        scope.$apply(function () {
+                            scope.config.xAxis.currentMin = thisChart.xAxis[0].dataMin;
+                            scope.config.xAxis.currentMax = thisChart.xAxis[0].dataMax;
+                        });
+                    }
+                });
+
+                prependMethod(mergedOptions.chart.events, 'addSeries', function(e){
+                    scope.config.xAxis.currentMin = this.xAxis[0].min || scope.config.xAxis.currentMin;
+                    scope.config.xAxis.currentMax = this.xAxis[0].max || scope.config.xAxis.currentMax;
+                });
+            }
+
+            if(config.xAxis) {
+                mergedOptions.xAxis = angular.copy(config.xAxis)
+            }
+            if(config.title) {
+                mergedOptions.title = config.title
+            }
+            return mergedOptions
+        }
+
+        var updateZoom = function (axis, modelAxis) {
+            var extremes = axis.getExtremes();
+            if(modelAxis.currentMin !== extremes.dataMin || modelAxis.currentMax !== extremes.dataMax) {
+                axis.setExtremes(modelAxis.currentMin, modelAxis.currentMax, false);
+            }
+        }
+
+        var processExtremes = function(chart, axis) {
+            if(axis.currentMin || axis.currentMax) {
+                chart.xAxis[0].setExtremes(axis.currentMin, axis.currentMax, true);
+            }
+        }
+
+        var processSeries = function(chart, series) {
+            var ids = []
+            if(series) {
+                ensureIds(series);
+
+                //Find series to add or update
+                series.forEach(function (s) {
+                    ids.push(s.id)
+                    var chartSeries = chart.get(s.id);
+                    if (chartSeries) {
+                        chartSeries.update(angular.copy(s), false);
+                    } else {
+                        chart.addSeries(angular.copy(s), false)
+                    }
+                });
+            }
+
+            //Now remove any missing series
+            for(var i = chart.series.length - 1; i >= 0; i--) {
+                var s = chart.series[i];
+                if (ids.indexOf(s.options.id) < 0) {
+                    s.remove(false);
+                }
+            };
+
+        }
+
+        var initialiseChart = function(scope, element, config) {
+            config || (config = {});
+            var mergedOptions = getMergedOptions(scope, element, config);
+            var chart = config.useHighStocks ? new Highcharts.StockChart(mergedOptions) : new Highcharts.Chart(mergedOptions);
+            if(config.xAxis) {
+                processExtremes(chart, config.xAxis);
+            }
+            processSeries(chart, config.series);
+            if(config.loading) {
+                chart.showLoading()
+            }
+            chart.redraw();
+            return chart;
+        }
+
+
+        return {
+            restrict: 'EAC',
+            replace: true,
+            template: '<div></div>',
+            scope: {
+                config: '='
+            },
+            link: function (scope, element, attrs) {
+
+                var chart = initialiseChart(scope, element, scope.config);
+
+                scope.$watch("config.series", function (newSeries, oldSeries) {
+                    //do nothing when called on registration
+                    if (newSeries === oldSeries) return;
+                    processSeries(chart, newSeries);
+                    chart.redraw();
+                }, true);
+
+                scope.$watch("config.title", function (newTitle) {
+                    chart.setTitle(newTitle, true);
+                }, true);
+
+                scope.$watch("config.loading", function (loading) {
+                    if(loading) {
+                        chart.showLoading()
+                    } else {
+                        chart.hideLoading()
+                    }
+                });
+
+                scope.$watch("config.useHighStocks", function (useHighStocks) {
+                    chart.destroy();
+                    chart = initialiseChart(scope, element, scope.config);
+                });
+
+                scope.$watch("config.xAxis", function (newAxes, oldAxes) {
+                    if (newAxes === oldAxes) return;
+                    if(newAxes) {
+                        chart.xAxis[0].update(newAxes);
+                        updateZoom(chart.xAxis[0], angular.copy(newAxes));
+                        chart.redraw();
+                    }
+                }, true);
+                scope.$watch("config.options", function (newOptions, oldOptions, scope) {
+                    //do nothing when called on registration
+                    if (newOptions === oldOptions) return;
+                    chart.destroy();
+                    chart = initialiseChart(scope, element, scope.config);
+
+                }, true);
+            }
+        }
+    });
+/**
  * Created by Akash on 6/5/2016.
  */
 'use strict';
@@ -179,66 +486,11 @@ angular.module('myApp')
         return {
             restrict: "A",
             templateUrl: "components/toolbar/toolbar.html",
-            controller: ["$scope", "currUser", "$mdDialog", "$mdMedia", "$mdToast", "$location", "$window", function($scope, currUser, $mdDialog, $mdMedia, $mdToast, $location, $window) {
-
-                $scope.user = null;
-
-
-                $scope.showLoginDialog = showLoginDialog;
-                $scope.showSignupDialog = showSignupDialog;
-                $scope.logout = logout;
-
-                $scope.go = function ( path ) {
-                    $location.path( path );
-                };
-
-                $scope.$watch(function(){
-                    return currUser.loggedIn();
-                }, function(loggedIn){
-                    $scope.loggedIn = loggedIn;
-                    if (loggedIn && !$scope.user){
-
-                        console.log("JWT Token");
-                        console.log( $window.localStorage.getItem('jwtToken'));
-                        $scope.user = currUser.getUser();
-                        console.log($scope.user);
-                    }
-                });
+            controller: ["$scope", "$mdDialog", "$mdMedia", "$mdToast", "$location", "$window", function($scope, $mdDialog, $mdMedia, $mdToast, $location, $window) {
 
                 /////////////////////
 
-                function showLoginDialog(){
-                    var useFullScreen = $mdMedia('xs');
-                    $mdDialog.show({
-                        controller: 'login', 
-                        templateUrl: 'components/login-dialog/login-dialog.html',
-                        clickOutsideToClose:true,
-                        fullscreen: useFullScreen
-                    });
-                };
-                function showSignupDialog(){
-                    var useFullScreen = $mdMedia('xs');
-                    $mdDialog.show({
-                        controller: 'register',
-                        templateUrl: 'components/register-dialog/register-dialog.html',
-                        clickOutsideToClose:true,
-                        fullscreen: useFullScreen
-                    });
-                };
 
-                function logout(){
-                    currUser.logout();
-                }
-
-                function showSimpleToast(txt){
-                    $mdToast.show(
-                        $mdToast.simple()
-                            .textContent(txt)
-                            .position('bottom right')
-                            .hideDelay(3000)
-
-                    );
-                }
             }]
         }
     });
@@ -260,9 +512,7 @@ angular.module('myApp.carouseldetail')
             }
         }
     })
-    .controller('CarouselDetailCtrl', ["$scope", "CarouselDetail", "$http", "BASEURL", "$element", function($scope, CarouselDetail, $http, BASEURL, $element) {
-
-        $scope.showCarousel = false;
+    .controller('CarouselDetailCtrl', ["$scope", "CarouselDetail", "$http", "BASEURL", "$interval", function($scope, CarouselDetail, $http, BASEURL, $interval) {
 
         $http({
             method: 'GET',
@@ -270,31 +520,48 @@ angular.module('myApp.carouseldetail')
         }).then(function successCallback(response) {
             var carouselIDList = response.data.Carousel_ids;
             $scope.carouselIDList = carouselIDList;
+            $scope.showCarousel = false;
+            console.log("getting all carousel list");
+            console.log($scope.showCarousel);
         }, function errorCallback(response) {
             alert("error retrieving carousel list");
         });
 
-        $scope.displayCarouselDetails = function () {
-            if ($scope.selectedItem !== undefined) {
-                $scope.showCarousel = true;
+        $scope.displayCarouselDetails = function(){
+            $scope.showCarousel = true;
+            getCarouselDetails();
+        }
+
+        function getCarouselDetails(){
+
+            if ($scope.selectedItem !== false) {
+                //$scope.showCarousel = true;
                 $http({
                     method: 'GET',
                     url: BASEURL + '/api/v1/getAllCarouselEvents/' + $scope.selectedItem
                 }).then(function successCallback(response) {
+                    $scope.response = response.data;
                     var carouselEvents = response.data;
                     var carouselID = carouselEvents.carousel_id;
                     var listOfFlights = carouselEvents.Flights;
                     $scope.carouselID = carouselID;
                     $scope.listOfFlights = listOfFlights;
+
                     var flightNumbers = [];
-                    var data = [];
+                    var flightData = [];
+                    var timeStamps = [];
                     for (var octr = 0; octr < listOfFlights.length; octr++) {
                         flightNumbers.push("Flight #" + listOfFlights[octr].flight_id);
                         var flightID = listOfFlights[octr].flight_id;
                         var events = listOfFlights[octr].Events;
                         var eventsArray = [];
+
                         for (var ictr = 0; ictr < events.length; ictr++) {
                             var xaxis = events[ictr].time;
+
+                            if(!(timeStamps.indexOf(xaxis)>=0))
+                                timeStamps.push(xaxis);
+
                             var yaxis = events[ictr].bags;
                             if (!yaxis)
                                 yaxis = 0;
@@ -303,73 +570,151 @@ angular.module('myApp.carouseldetail')
                             event["y"] = yaxis;
                             eventsArray.push(event);
                         }
-                        var colorCode = '#' + (function co(lor) {
-                                return (lor +=
-                                    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'a', 'b', 'c', 'd', 'e', 'f'][Math.floor(Math.random() * 16)])
-                                && (lor.length == 6) ? lor : co(lor);
-                            })('');
+
                         var dataEntry = {};
-                        dataEntry["values"] = eventsArray;
-                        dataEntry["key"] = "flight #" + flightID;
-                        dataEntry["color"] = colorCode;
-                        data.push(dataEntry);
+                        dataEntry["name"] = "flight #" + flightID;
+                        dataEntry["data"] = eventsArray;
+                        flightData.push(dataEntry);
+
                     }
-                    $scope.data = data;
-                    $scope.series = flightNumbers;
+
+                    timeStamps = timeStamps.sort();
+                    flightNumbers = flightNumbers.sort();
+                    var chartData = [];
+                    console.log("CONSTRUCTING CHART DATA");
+                    for(var octr=0;octr<flightData.length;octr++){
+                        var flightEvents = {};
+                        flightEvents["name"] = flightData[octr].name;
+                        var flightBags = [];
+
+                        var timeEvents = flightData[octr].data;
+                        var existingTimeStamps = [];
+
+                        for(var ictr=0;ictr<timeEvents.length;ictr++){
+                            existingTimeStamps.push(timeEvents[ictr].x)
+                        }
+
+                        for(var ictr=0;ictr<timeStamps.length;ictr++){
+                            var index = existingTimeStamps.indexOf(timeStamps[ictr]);
+                            if(index>=0){
+                                console.log(timeEvents[index].y);
+                                flightBags.push(timeEvents[index].y);
+                            }
+                            else{ // timestamp does not exist
+                                flightBags.push(0);
+                            }
+                        }
+                        flightEvents["data"] = flightBags;
+                        chartData.push(flightEvents);
+                    }
+
+                    var chartConfig = {
+                        chart: {
+                            type: 'column',
+                            options3d: {
+                                enabled: true,
+                                alpha: 15,
+                                beta: 15,
+                                viewDistance: 25,
+                                depth: 40
+                            }
+                        },
+
+                        title: {
+                            text: 'LOAD ON CAROUSEL',
+                            style : {
+                                fontWeight:'bold',
+                                fontStyle:'italic',
+                                fontFamily:'Calibri',
+                                color:'black'
+                            }
+                        },
+                        xAxis: {
+                            title: {
+                                text: 'time',
+                                style : {
+                                    fontWeight:'bold',
+                                    color:'black'
+                                }
+                            },
+                            categories: timeStamps
+                        },
+                        yAxis: {
+                            title: {
+                                text: 'time',
+                                style : {
+                                    fontWeight:'bold',
+                                    color:'black'
+                                }
+                            },
+                            min: 0,
+                            max:40,
+                            stackLabels: {
+                                enabled: true,
+                                style: {
+                                    fontWeight: 'bold',
+                                    color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+                                }
+                            }
+                        },
+                        options: {
+                            chart: {
+                                type: 'column'
+                            },
+                            legend: {
+                                align: 'right',
+                                x: -70,
+                                verticalAlign: 'top',
+                                y: 20,
+                                floating: true,
+                                backgroundColor:(Highcharts.theme && Highcharts.theme.textColor) || 'white',
+                                borderColor: '#CCC',
+                                borderWidth: 1,
+                                shadow: false
+                            },
+                            tooltip: {
+                                formatter: function() {
+                                    return '<b>'+ this.x +'</b><br/>'+
+                                        this.series.name +': '+ this.y +'<br/>'+
+                                        'Total: '+ this.point.stackTotal;
+                                }
+                            },
+                            plotOptions: {
+                                column: {
+                                    stacking: 'normal',
+                                    dataLabels: {
+                                        enabled: true,
+                                        color:  'white',
+                                        style: {
+                                            textShadow: '0 0 3px black, 0 0 3px black'
+                                        }
+                                    }
+                                }
+                            }},
+                        series: chartData
+                    };
+
+                    $scope.chartConfig = chartConfig;
 
                 }, function errorCallback(response) {
                     alert("error retrieving carousel details");
                 });
 
 
-                $scope.options = {
-                    chart: {
-                        type: 'lineChart',
-                        margin: {
-                            top: 20,
-                            right: 20,
-                            bottom: 40,
-                            left: 55
-                        },
-                        x: function (d) {
-                            return d.x;
-                        },
-                        y: function (d) {
-                            return d.y;
-                        },
-                        useInteractiveGuideline: true,
-                        dispatch: {
-                            stateChange: function (e) {
-                                console.log("stateChange");
-                            },
-                            changeState: function (e) {
-                                console.log("changeState");
-                            },
-                            tooltipShow: function (e) {
-                                console.log("tooltipShow");
-                            },
-                            tooltipHide: function (e) {
-                                console.log("tooltipHide");
-                            }
-                        },
-                        xAxis: {
-                            axisLabel: 'Time'
-                        },
-                        yAxis: {
-                            axisLabel: 'Number of Bags',
-                            axisLabelDistance: -10,
-                            css: {
-                                'font-size':'18px'
-                            }
-                        }
-                    }
-                };
-
                 return "You have selected: Carousel " + $scope.selectedItem;
             } else {
                 return "Please select a Carousel";
             }
         }
+
+        $interval(function(){
+            if($scope.showCarousel==true) {
+                console.log("reloading..");
+                getCarouselDetails();
+            }
+        },5000);
+
+
     }]);
 
 /**
@@ -395,9 +740,11 @@ angular.module('myApp.dashboard')
             }
         }
     })
-    .controller('DashboardCtrl', ["$scope", "Dashboard", function($scope, Dashboard) {
+    .controller('DashboardCtrl', ["$scope", "Dashboard", "$interval", "NgTableParams", function($scope, Dashboard, $interval, NgTableParams) {
 
-        var dashboardDetailsPromise =  Dashboard.query(function(){
+        var dashboardDetailsPromise =  Dashboard.query(getDashboardDetails);
+
+        function getDashboardDetails() {
 
             var dashboardDetails = [];
 
@@ -405,11 +752,131 @@ angular.module('myApp.dashboard')
                 dashboardDetails.push(dashboardDetailsPromise[ctr]);
             }
 
-            $scope.dashboardTable = dashboardDetails;
 
-            $scope.pieChartLabels = ["1 Star","2 Star","3 Star","4 Star","5 Star"];
-            $scope.pieChartData = [one,two,three,four,five ];
+            console.log(dashboardDetails);
 
-        });
+            //$scope.dashboardTable = dashboardDetails;
+            //$scope.tableParams = new NgTableParams({}, { dataset: $scope.dashboardTable});
+            $scope.tableParams = createUsingFullOptions();
+
+            function createUsingFullOptions() {
+                var initialParams = {
+                    count: 10 // initial page size
+                };
+                var initialSettings = {
+                    // page size buttons (right set of buttons in demo)
+                    counts: [],
+                    // determines the pager buttons (left set of buttons in demo)
+                    paginationMaxBlocks: 10,
+                    paginationMinBlocks: 2,
+                    dataset: dashboardDetails
+                };
+                return new NgTableParams(initialParams, initialSettings);
+            }
+
+            var red=0;
+            var green=0;
+            var orange=0;
+            for(var ctr=0;ctr<dashboardDetails.length;ctr++){
+                if(dashboardDetails[ctr].carouselStatus==='OK')
+                    green++;
+                else if(dashboardDetails[ctr].carouselStatus==='WARNING')
+                    orange++;
+                else if(dashboardDetails[ctr].carouselStatus==='DANGER')
+                    red++;
+            }
+
+            var pieChartConfig = {
+                /*chart: {
+                 type: 'bar'
+                 },
+                 title: {
+                 text: 'Stacked bar chart'
+                 },
+                 xAxis: {
+                 categories: ['Apples', 'Oranges', 'Pears', 'Grapes', 'Bananas']
+                 },
+                 yAxis: {
+                 min: 0,
+                 title: {
+                 text: 'Total fruit consumption'
+                 }
+                 },
+                 legend: {
+                 reversed: true
+                 },
+                 plotOptions: {
+                 series: {
+                 stacking: 'normal'
+                 }
+                 },
+                 series: [{
+                 name: 'John',
+                 data: [5, 3, 4, 7, 2]
+                 }, {
+                 name: 'Jane',
+                 data: [2, 2, 3, 2, 1]
+                 }, {
+                 name: 'Joe',
+                 data: [3, 4, 4, 2, 5]
+                 }]*/
+                chart: {
+                    renderTo: 'container',
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false
+                },
+                title: {
+                    text: 'Carousel Status'
+                },
+                tooltip: {
+                    pointFormat: '{series.name}: <b>{point.percentage}%</b>',
+                    percentageDecimals: 1
+                },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: true,
+                            color: '#000000',
+                            connectorColor: '#000000',
+                            formatter: function () {
+                                return '<b>' + this.point.name + '</b>: ' + this.percentage + ' %';
+                            }
+                        },
+                        showInLegend: true
+                    }
+                },
+                series: [{
+                    type: 'pie',
+                    name: 'Carousel Status',
+                    data: [{
+                        name: 'Danger',
+                        color: 'lightcoral',
+                        y:red,
+                        sliced: true
+                    }, {
+                        name: 'Ok',
+                        color: 'lightgreen',
+                        y:green,
+                        sliced: true
+                    }, {
+                        name: 'Warning',
+                        color: 'lightsalmon',
+                        y:orange,
+                        sliced: true
+                    }]
+                }]
+            };
+
+            $scope.pieChartConfig = pieChartConfig;
+
+        };
+
+        $interval(function(){
+            console.log("Reloading data ...")
+            getDashboardDetails();
+        },50000);
 
     }]);

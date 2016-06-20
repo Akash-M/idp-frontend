@@ -38,7 +38,7 @@
                 <h1 class="md-title"><b>PICK A CAROUSEL</b></h1>
                 <div layout="row">
                     <md-input-container flex="50">
-                        <md-select ng-model="selectedItem" md-selected-text="displayCarouselDetails()">
+                        <md-select ng-model="selectedItem" ng-change="displayCarouselDetails()">
                             <md-optgroup label="Carousels">
                                 <md-option ng-value="carousel" ng-repeat="carousel in carouselIDList">
                                     Carousel {{carousel}}</md-option>

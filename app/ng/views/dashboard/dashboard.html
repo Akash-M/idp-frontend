@@ -1,9 +1,16 @@
-<div layout="row" layout-padding style="margin-top:2%;">
+<div layout="row" layout-padding="3" style="margin-top:2%;">
 
-    <div flex="100">
+    <div flex="75">
 
-        <md-card mv-history md-whiteframe="3"></md-card>
+        <md-card mv-history md-whiteframe="3" layout-padding="3"
+                 style="border-left:5px solid #202A47;border-radius:5px;"></md-card>
 
+    </div>
+    <div flex="25">
+        <md-card md-whiteframe="3" layout-padding="3" style="border-left:5px solid #202A47;border-radius:5px;">
+            <highchart config="pieChartConfig"
+                       class="span10" style="width:95%;margin-top:5%;"></highchart>
+        </md-card>
     </div>
 
 </div>
