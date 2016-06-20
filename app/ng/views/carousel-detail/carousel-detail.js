@@ -100,6 +100,8 @@ angular.module('myApp.carouseldetail')
                     timeStamps = timeStamps.sort();
                     flightNumbers = flightNumbers.sort();
                     var chartData = [];
+                    var totalBags = [];
+                    var lineChartData = [];
                     for(var octr=0;octr<flightData.length;octr++){
                         var flightEvents = {};
                         flightEvents["name"] = flightData[octr].name;
@@ -115,7 +117,12 @@ angular.module('myApp.carouseldetail')
                         for(var ictr=0;ictr<timeStamps.length;ictr++){
                             var index = existingTimeStamps.indexOf(timeStamps[ictr]);
                             if(index>=0){
-                                flightBags.push(timeEvents[index].y);
+                                var total=0;
+                                for(var ctr=0;ctr<flightBags.length;ctr++){
+                                    total += flightBags[ctr];
+                                }
+                                total += timeEvents[index].y;
+                                flightBags.push(total);
                             }
                             else{ // timestamp does not exist
                                 if(flightBags[flightBags.length-1])
@@ -126,9 +133,21 @@ angular.module('myApp.carouseldetail')
                         }
                         flightEvents["data"] = flightBags;
                         chartData.push(flightEvents);
+                        totalBags.push(flightEvents.data);
                     }
 
-                    var pieChartConfig = {
+                    console.log("total bags");
+                    console.log(totalBags);
+                    var lineChartData = [];
+                    for (var col = 0; col < totalBags[0].length; col++)
+                    {
+                        var total = 0;
+                        for (var row = 0; row < totalBags.length; row++)
+                            total += totalBags[row][col];
+                        lineChartData.push(total);
+                    }
+
+                    var barChartConfig = {
                         chart: {
                             type: 'column',
                             options3d: {
@@ -218,14 +237,45 @@ angular.module('myApp.carouseldetail')
                         series: chartData
                     };
 
-                    $scope.pieChartConfig = pieChartConfig;
+                    $scope.barChartConfig = barChartConfig;
 
                     var lineChartConfig = {
-                        chart: {
-                            type: 'bar'
+                        options: {
+                            chart: {
+                                type: 'line'
+                            }
+                        },
+                        series: [{
+                            data: lineChartData
+                        }],
+                        xAxis: {
+                            title: {
+                                text: 'Time',
+                                style : {
+                                    fontWeight:'bold',
+                                    color:'black',
+                                    fontSize: '24'
+                                }
+                            }
+                        },
+                        yAxis: {
+                            title: {
+                                text: 'Total no. of bags',
+                                style : {
+                                    fontWeight:'bold',
+                                    color:'black',
+                                    fontSize: '24'
+                                }
+                            }
+                        },
+                        tooltip: {
+                            formatter: function() {
+                                return '<b>'+ this.x +'</b><br/>'+
+                                    this.series.name +': '+ this.y +'<br/>';
+                            }
                         },
                         title: {
-                            text: 'LOAD ON CAROUSEL(Stacked Line Representation)',
+                            text: 'LOAD ON CAROUSEL(Line chart representation)',
                             style : {
                                 fontWeight:'bold',
                                 fontStyle:'italic',
@@ -234,37 +284,7 @@ angular.module('myApp.carouseldetail')
                                 fontSize: '24'
                             }
                         },
-                        xAxis: {
-                            categories: timeStamps
-                        },
-                        yAxis: {
-                            title: {
-                                text: 'No.of bags',
-                                style : {
-                                    fontWeight:'bold',
-                                    color:'black'
-                                }
-                            },
-                            min: 0,
-                            max:40,
-                            stackLabels: {
-                                enabled: true,
-                                style: {
-                                    fontWeight: 'bold',
-                                    color: 'black',
-                                    fontSize: '30'
-                                }
-                            }
-                        },
-                        legend: {
-                            reversed: true
-                        },
-                        plotOptions: {
-                            series: {
-                                stacking: 'normal'
-                            }
-                        },
-                        series: chartData
+                        loading: false
                     };
 
                     $scope.lineChartConfig = lineChartConfig;

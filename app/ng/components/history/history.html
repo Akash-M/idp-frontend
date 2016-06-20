@@ -43,9 +43,7 @@
         <td title="'Flight ID'" >
             <span ng-repeat="flight in data.flight_id">{{flight}} <br/></span>
         </td>
-        <td title="'No. of work stations'" >
-            {{data.workstations}}
-        </td>
+        <td title="'No. of work stations'" >{{data.workstations}} </td>
         <td title="'Status'" 
             ng-class="{'red': (data.carouselStatus == 'DANGER'), 'orange': (data.carouselStatus =='WARNING'),
                                 'green':(data.carouselStatus == 'OK')}">{{data.carouselStatus}}
