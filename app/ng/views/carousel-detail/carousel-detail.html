@@ -1,5 +1,5 @@
 <style>
-    text{
+    text {
         font-weight: bold;
         color: black;
         font-size: 24px;
@@ -17,7 +17,8 @@
 
     <div layout="row">
 
-        <md-card flex="25" ng-if="showCarousel" md-whiteframe="3" style="border-left:5px solid #202A47;border-radius:5px;">
+        <md-card flex="25" ng-if="showCarousel" md-whiteframe="3"
+                 style="border-left:5px solid #202A47;border-radius:5px;">
 
             <md-card-title-text style="margin-left:20px;">
                 <span class="md-headline"><h4><b>Carousel ID : {{carouselID}}</b></h4></span>
@@ -32,7 +33,8 @@
                            style="width:100%;margin-left:1%" ng-repeat="flight in $data">
 
                         <tr>
-                            <td colspan="4"><b>FLIGHT #{{flight.flight_id}}</b></td></tr>
+                            <td colspan="4"><b>FLIGHT #{{flight.flight_id}}</b></td>
+                        </tr>
 
                         <tr>
                             <td><b>TIME</b></td>
@@ -49,6 +51,32 @@
                             </td>
                         </tr>
 
+                    </table>
+
+                    <table class="table table-bordered table-striped" style="width:100%;margin-left:1%">
+                        <tr>
+                            <td colspan="4"><b>LEGEND OF EVENTS</b></td>
+                        </tr>
+                        <tr>
+                            <td>SH</td>
+                            <td>Start of Baggage Handling</td>
+                        </tr>
+                        <tr>
+                            <td>WH</td>
+                            <td>Worker Start To Handle</td>
+                        </tr>
+                        <tr>
+                            <td>SD</td>
+                            <td>Start of Storage Depletion</td>
+                        </tr>
+                        <tr>
+                            <td>BA</td>
+                            <td>Arrival or Loading of Baggage</td>
+                        </tr>
+                        <tr>
+                            <td>EH</td>
+                            <td>End of Baggage Handling</td>
+                        </tr>
                     </table>
                 </div>
 

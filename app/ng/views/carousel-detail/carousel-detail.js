@@ -117,12 +117,15 @@ angular.module('myApp.carouseldetail')
                         for(var ictr=0;ictr<timeStamps.length;ictr++){
                             var index = existingTimeStamps.indexOf(timeStamps[ictr]);
                             if(index>=0){
-                                var total=0;
+                                /*var total=0;
                                 for(var ctr=0;ctr<flightBags.length;ctr++){
                                     total += flightBags[ctr];
                                 }
-                                total += timeEvents[index].y;
-                                flightBags.push(total);
+                                total += timeEvents[index].y;*/
+                                if(flightBags[flightBags.length-1]+timeEvents[index].y)
+                                    flightBags.push(flightBags[flightBags.length-1]+timeEvents[index].y);
+                                else 
+                                    flightBags.push(0);
                             }
                             else{ // timestamp does not exist
                                 if(flightBags[flightBags.length-1])
@@ -135,6 +138,8 @@ angular.module('myApp.carouseldetail')
                         chartData.push(flightEvents);
                         totalBags.push(flightEvents.data);
                     }
+
+                    //console.log(totalBags);    
 
                     var lineChartData = [];
                     for (var col = 0; col < totalBags[0].length; col++)
@@ -158,7 +163,7 @@ angular.module('myApp.carouseldetail')
                         },
 
                         title: {
-                            text: 'LOAD ON CAROUSEL(Stacked Bar representation)',
+                            text: 'No of Bags on Carousel vs Time (per Flight)',
                             style : {
                                 fontWeight:'bold',
                                 fontStyle:'italic',
@@ -169,7 +174,7 @@ angular.module('myApp.carouseldetail')
                         },
                         xAxis: {
                             title: {
-                                text: 'time',
+                                text: 'Time',
                                 style : {
                                     fontWeight:'bold',
                                     color:'black',
@@ -244,7 +249,8 @@ angular.module('myApp.carouseldetail')
                             }
                         },
                         series: [{
-                            data: lineChartData
+                            data: lineChartData,
+                            name: 'TOTAL NO OF BAGS'
                         }],
                         xAxis: {
                             title: {
@@ -269,12 +275,12 @@ angular.module('myApp.carouseldetail')
                         },
                         tooltip: {
                             formatter: function() {
-                                return '<b>'+ this.x +'</b><br/>'+
+                                return 'TIME: '+ this.x +'<br/>'+
                                     this.series.name +': '+ this.y +'<br/>';
                             }
                         },
                         title: {
-                            text: 'LOAD ON CAROUSEL(Line chart representation)',
+                            text: 'Total No of Bags on Carousel vs Time',
                             style : {
                                 fontWeight:'bold',
                                 fontStyle:'italic',
@@ -285,7 +291,7 @@ angular.module('myApp.carouseldetail')
                         },
                         loading: false
                     };
-
+                    //console.log(lineChartData);    
                     $scope.lineChartConfig = lineChartConfig;
 
                 }, function errorCallback(response) {

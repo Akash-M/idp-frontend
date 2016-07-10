@@ -166,314 +166,6 @@ angular.module('myApp.dashboard')
         };
     });
 /**
- * Sand-Signika theme for Highcharts JS
- * @author Torstein Honsi
- */
-
-// Load the fonts
-/*
-Highcharts.createElement('link', {
-    href: 'https://fonts.googleapis.com/css?family=Signika:400,700',
-    rel: 'stylesheet',
-    type: 'text/css'
-}, null, document.getElementsByTagName('head')[0]);
-
-// Add the background image to the container
-Highcharts.wrap(Highcharts.Chart.prototype, 'getContainer', function (proceed) {
-    proceed.call(this);
-    this.container.style.background = 'url(http://www.highcharts.com/samples/graphics/sand.png)';
-});
-
-
-Highcharts.theme = {
-    colors: ["#f45b5b", "#8085e9", "#8d4654", "#7798BF", "#aaeeee", "#ff0066", "#eeaaee",
-        "#55BF3B", "#DF5353", "#7798BF", "#aaeeee"],
-    chart: {
-        backgroundColor: null,
-        style: {
-            fontFamily: "Signika, serif"
-        }
-    },
-    title: {
-        style: {
-            color: 'black',
-            fontSize: '16px',
-            fontWeight: 'bold'
-        }
-    },
-    subtitle: {
-        style: {
-            color: 'black'
-        }
-    },
-    tooltip: {
-        borderWidth: 0
-    },
-    legend: {
-        itemStyle: {
-            fontWeight: 'bold',
-            fontSize: '13px'
-        }
-    },
-    xAxis: {
-        labels: {
-            style: {
-                color: '#6e6e70'
-            }
-        }
-    },
-    yAxis: {
-        labels: {
-            style: {
-                color: '#6e6e70'
-            }
-        }
-    },
-    plotOptions: {
-        series: {
-            shadow: true
-        },
-        candlestick: {
-            lineColor: '#404048'
-        },
-        map: {
-            shadow: false
-        }
-    },
-
-    // Highstock specific
-    navigator: {
-        xAxis: {
-            gridLineColor: '#D0D0D8'
-        }
-    },
-    rangeSelector: {
-        buttonTheme: {
-            fill: 'white',
-            stroke: '#C0C0C8',
-            'stroke-width': 1,
-            states: {
-                select: {
-                    fill: '#D0D0D8'
-                }
-            }
-        }
-    },
-    scrollbar: {
-        trackBorderColor: '#C0C0C8'
-    },
-
-    // General
-    background2: '#E0E0E8'
-
-};
-
-// Apply the theme
-Highcharts.setOptions(Highcharts.theme);*/
-
-/**
- * Created by Akash on 6/19/2016.
- */
-'use strict';
-
-angular.module('highcharts-ng', [])
-    .directive('highchart', function () {
-
-        function prependMethod(obj, method, func) {
-            var original = obj[method];
-            obj[method] = function () {
-                var args = Array.prototype.slice.call(arguments);
-                func.apply(this, args);
-                if(original) {
-                    return original.apply(this, args);
-                }  else {
-                    return;
-                }
-
-            };
-        }
-
-        function deepExtend(destination, source) {
-            for (var property in source) {
-                if (source[property] && source[property].constructor &&
-                    source[property].constructor === Object) {
-                    destination[property] = destination[property] || {};
-                    deepExtend(destination[property], source[property]);
-                } else {
-                    destination[property] = source[property];
-                }
-            }
-            return destination;
-        }
-
-        var seriesId = 0;
-        var ensureIds = function (series) {
-            series.forEach(function (s) {
-                if (!angular.isDefined(s.id)) {
-                    s.id = "series-" + seriesId++;
-                }
-            });
-        }
-
-        var defaultOptions = {
-            chart: {
-                events: {}
-            },
-            title: {},
-            series: [],
-            navigator: {enabled: false}
-        }
-
-        var getMergedOptions = function (scope, element, config) {
-            var mergedOptions = {}
-            if (config.options) {
-                mergedOptions = deepExtend(defaultOptions, config.options);
-            } else {
-                mergedOptions = defaultOptions;
-            }
-            mergedOptions.chart.renderTo = element[0];
-            if(config.xAxis) {
-                prependMethod(mergedOptions.chart.events, 'selection', function(e){
-                    var thisChart = this;
-                    if(e.xAxis) {
-                        scope.$apply(function () {
-                            scope.config.xAxis.currentMin = e.xAxis[0].min;
-                            scope.config.xAxis.currentMax = e.xAxis[0].max;
-                        });
-                    } else {
-                        //handle reset button - zoom out to all
-                        scope.$apply(function () {
-                            scope.config.xAxis.currentMin = thisChart.xAxis[0].dataMin;
-                            scope.config.xAxis.currentMax = thisChart.xAxis[0].dataMax;
-                        });
-                    }
-                });
-
-                prependMethod(mergedOptions.chart.events, 'addSeries', function(e){
-                    scope.config.xAxis.currentMin = this.xAxis[0].min || scope.config.xAxis.currentMin;
-                    scope.config.xAxis.currentMax = this.xAxis[0].max || scope.config.xAxis.currentMax;
-                });
-            }
-
-            if(config.xAxis) {
-                mergedOptions.xAxis = angular.copy(config.xAxis)
-            }
-            if(config.title) {
-                mergedOptions.title = config.title
-            }
-            return mergedOptions
-        }
-
-        var updateZoom = function (axis, modelAxis) {
-            var extremes = axis.getExtremes();
-            if(modelAxis.currentMin !== extremes.dataMin || modelAxis.currentMax !== extremes.dataMax) {
-                axis.setExtremes(modelAxis.currentMin, modelAxis.currentMax, false);
-            }
-        }
-
-        var processExtremes = function(chart, axis) {
-            if(axis.currentMin || axis.currentMax) {
-                chart.xAxis[0].setExtremes(axis.currentMin, axis.currentMax, true);
-            }
-        }
-
-        var processSeries = function(chart, series) {
-            var ids = []
-            if(series) {
-                ensureIds(series);
-
-                //Find series to add or update
-                series.forEach(function (s) {
-                    ids.push(s.id)
-                    var chartSeries = chart.get(s.id);
-                    if (chartSeries) {
-                        chartSeries.update(angular.copy(s), false);
-                    } else {
-                        chart.addSeries(angular.copy(s), false)
-                    }
-                });
-            }
-
-            //Now remove any missing series
-            for(var i = chart.series.length - 1; i >= 0; i--) {
-                var s = chart.series[i];
-                if (ids.indexOf(s.options.id) < 0) {
-                    s.remove(false);
-                }
-            };
-
-        }
-
-        var initialiseChart = function(scope, element, config) {
-            config || (config = {});
-            var mergedOptions = getMergedOptions(scope, element, config);
-            var chart = config.useHighStocks ? new Highcharts.StockChart(mergedOptions) : new Highcharts.Chart(mergedOptions);
-            if(config.xAxis) {
-                processExtremes(chart, config.xAxis);
-            }
-            processSeries(chart, config.series);
-            if(config.loading) {
-                chart.showLoading()
-            }
-            chart.redraw();
-            return chart;
-        }
-
-
-        return {
-            restrict: 'EAC',
-            replace: true,
-            template: '<div></div>',
-            scope: {
-                config: '='
-            },
-            link: function (scope, element, attrs) {
-
-                var chart = initialiseChart(scope, element, scope.config);
-
-                scope.$watch("config.series", function (newSeries, oldSeries) {
-                    //do nothing when called on registration
-                    if (newSeries === oldSeries) return;
-                    processSeries(chart, newSeries);
-                    chart.redraw();
-                }, true);
-
-                scope.$watch("config.title", function (newTitle) {
-                    chart.setTitle(newTitle, true);
-                }, true);
-
-                scope.$watch("config.loading", function (loading) {
-                    if(loading) {
-                        chart.showLoading()
-                    } else {
-                        chart.hideLoading()
-                    }
-                });
-
-                scope.$watch("config.useHighStocks", function (useHighStocks) {
-                    chart.destroy();
-                    chart = initialiseChart(scope, element, scope.config);
-                });
-
-                scope.$watch("config.xAxis", function (newAxes, oldAxes) {
-                    if (newAxes === oldAxes) return;
-                    if(newAxes) {
-                        chart.xAxis[0].update(newAxes);
-                        updateZoom(chart.xAxis[0], angular.copy(newAxes));
-                        chart.redraw();
-                    }
-                }, true);
-                scope.$watch("config.options", function (newOptions, oldOptions, scope) {
-                    //do nothing when called on registration
-                    if (newOptions === oldOptions) return;
-                    chart.destroy();
-                    chart = initialiseChart(scope, element, scope.config);
-
-                }, true);
-            }
-        }
-    });
-/**
  * Created by Akash on 6/5/2016.
  */
 'use strict';
@@ -617,12 +309,15 @@ angular.module('myApp.carouseldetail')
                         for(var ictr=0;ictr<timeStamps.length;ictr++){
                             var index = existingTimeStamps.indexOf(timeStamps[ictr]);
                             if(index>=0){
-                                var total=0;
+                                /*var total=0;
                                 for(var ctr=0;ctr<flightBags.length;ctr++){
                                     total += flightBags[ctr];
                                 }
-                                total += timeEvents[index].y;
-                                flightBags.push(total);
+                                total += timeEvents[index].y;*/
+                                if(flightBags[flightBags.length-1]+timeEvents[index].y)
+                                    flightBags.push(flightBags[flightBags.length-1]+timeEvents[index].y);
+                                else 
+                                    flightBags.push(0);
                             }
                             else{ // timestamp does not exist
                                 if(flightBags[flightBags.length-1])
@@ -636,8 +331,8 @@ angular.module('myApp.carouseldetail')
                         totalBags.push(flightEvents.data);
                     }
 
-                    console.log("total bags");
-                    console.log(totalBags);
+                    //console.log(totalBags);    
+
                     var lineChartData = [];
                     for (var col = 0; col < totalBags[0].length; col++)
                     {
@@ -660,7 +355,7 @@ angular.module('myApp.carouseldetail')
                         },
 
                         title: {
-                            text: 'LOAD ON CAROUSEL(Stacked Bar representation)',
+                            text: 'No of Bags on Carousel vs Time (per Flight)',
                             style : {
                                 fontWeight:'bold',
                                 fontStyle:'italic',
@@ -671,7 +366,7 @@ angular.module('myApp.carouseldetail')
                         },
                         xAxis: {
                             title: {
-                                text: 'time',
+                                text: 'Time',
                                 style : {
                                     fontWeight:'bold',
                                     color:'black',
@@ -746,7 +441,8 @@ angular.module('myApp.carouseldetail')
                             }
                         },
                         series: [{
-                            data: lineChartData
+                            data: lineChartData,
+                            name: 'TOTAL NO OF BAGS'
                         }],
                         xAxis: {
                             title: {
@@ -756,7 +452,8 @@ angular.module('myApp.carouseldetail')
                                     color:'black',
                                     fontSize: '24'
                                 }
-                            }
+                            },
+                            categories: timeStamps
                         },
                         yAxis: {
                             title: {
@@ -770,12 +467,12 @@ angular.module('myApp.carouseldetail')
                         },
                         tooltip: {
                             formatter: function() {
-                                return '<b>'+ this.x +'</b><br/>'+
+                                return 'TIME: '+ this.x +'<br/>'+
                                     this.series.name +': '+ this.y +'<br/>';
                             }
                         },
                         title: {
-                            text: 'LOAD ON CAROUSEL(Line chart representation)',
+                            text: 'Total No of Bags on Carousel vs Time',
                             style : {
                                 fontWeight:'bold',
                                 fontStyle:'italic',
@@ -786,7 +483,7 @@ angular.module('myApp.carouseldetail')
                         },
                         loading: false
                     };
-
+                    //console.log(lineChartData);    
                     $scope.lineChartConfig = lineChartConfig;
 
                 }, function errorCallback(response) {
